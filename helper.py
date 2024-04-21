@@ -28,32 +28,38 @@ def findWords(letters_in, letters_not_in, positions, words):
 
     return filtered_words
 
+def most_likely_word(input_words):
+    # Create a set of letters from each word for efficient comparison
+    words_sets = {word: set(word) for word in input_words}
+
+    # Calculate the word with the most common letters
+    common_letters_count = {word: sum(count_common_letters(letters, other_letters)
+                                    for other_word, other_letters in words_sets.items() if other_word != word)
+                            for word, letters in words_sets.items()}
+    return max(common_letters_count, key=common_letters_count.get)
+
 # Load base form words and convert to uppercase once
 base_words = get_base_form_words()
 base_words = [word.upper() for word in base_words]
 
 # Configuration
-number_of_letters = 7
-letters_in = "COEN"
-letters_not_in = "FUDIGATISCTBITI"
-positions = ["", "C", "", "N", "O", "", "", ""]
+number_of_letters = 4
+letters_in = "ap"
+letters_not_in = "oes"
+positions = ["", "L", "A", ""]
 
 # Prepare data
 letters_in = set(letters_in.upper())
 letters_not_in = set(letters_not_in.upper()) - letters_in
 words_of_length = get_words_of_length(number_of_letters, base_words)
 
-# Create a set of letters from each word for efficient comparison
-words_sets = {word: set(word) for word in words_of_length}
-
-# Calculate the word with the most common letters
-common_letters_count = {word: sum(count_common_letters(letters, other_letters)
-                                  for other_word, other_letters in words_sets.items() if other_word != word)
-                        for word, letters in words_sets.items()}
-max_word = max(common_letters_count, key=common_letters_count.get)
-
-print("The word with the most letters common with other words is:", max_word)
+if letters_in == "" and letters_not_in == "":
+    print("The word with the most letters common with other words is:", most_likely_word(words_of_length))
+    exit()
 
 # Find matching words based on the criteria
 resulting_words = findWords(letters_in, letters_not_in, positions, words_of_length)
 print(resulting_words)
+
+# TODO - should also take in account the positions
+print("The word with the most letters common with other words is:", most_likely_word(resulting_words))
